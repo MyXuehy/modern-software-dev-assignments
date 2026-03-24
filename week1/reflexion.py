@@ -14,9 +14,30 @@ the function is_valid_password(password: str) -> bool. No prose or comments.
 Keep the implementation minimal.
 """
 
-# TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = """
+You are a code repair assistant.
 
+You will receive:
+1) the previous implementation of is_valid_password(password: str) -> bool
+2) concrete failing test diagnostics
+
+Your task:
+- Fix the implementation so it satisfies the password policy exactly.
+- Return ONLY one fenced Python code block.
+- Do not include prose.
+
+Target policy (must all be true):
+- length >= 8
+- contains at least one lowercase letter
+- contains at least one uppercase letter
+- contains at least one digit
+- contains at least one special character from: !@#$%^&*()-_
+- contains no whitespace
+
+Output constraints:
+- Define exactly: is_valid_password(password: str) -> bool
+- Keep code minimal and deterministic.
+"""
 
 # Ground-truth test suite used to evaluate generated code
 SPECIALS = set("!@#$%^&*()-_")
@@ -96,7 +117,21 @@ def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
-    return ""
+    failure_block = "\n".join(f"- {f}" for f in failures) if failures else "- (no failures provided)"
+    return f"""
+Previous implementation:
+```python
+{prev_code}
+```
+
+Observed test failures:
+{failure_block}
+
+Please repair the function using the same signature:
+is_valid_password(password: str) -> bool
+
+Return ONLY one fenced Python code block.
+""".strip()
 
 
 def apply_reflexion(
