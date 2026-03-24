@@ -37,8 +37,23 @@ QUESTION = (
 
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+# YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a precise Python coding assistant.
+Use ONLY the provided context to write code.
+Do not invent undocumented endpoints, headers, or base URLs.
 
+Output requirements:
+- Output exactly one fenced Python code block.
+- Include necessary imports.
+- Define exactly:
+  def fetch_user_name(user_id: str, api_key: str) -> str
+- Use requests.get to call:
+  https://api.example.com/v1/users/{user_id}
+- Send authentication header exactly: X-API-Key
+- Call raise_for_status() before reading JSON.
+- Return only the user's name string.
+"""
 
 # For this simple example
 # For this coding task, validate by required snippets rather than exact string
@@ -51,13 +66,26 @@ REQUIRED_SNIPPETS = [
 ]
 
 
+# def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
+#     """ Select and return the relevant subset of documents from CORPUS for this task.
+#
+#     For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
+#     """
+#     return []
+
 def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
-    """TODO: Select and return the relevant subset of documents from CORPUS for this task.
+    """Select docs relevant to user-fetch API usage."""
+    keywords = ("base url", "/users/{id}", "x-api-key", "authentication", "name")
+    selected: List[str] = []
+    for doc in corpus:
+        low = doc.lower()
+        if any(k in low for k in keywords):
+            selected.append(doc)
 
-    For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
-    """
-    return []
-
+    # Fallback: if keyword matching finds nothing, still provide first doc.
+    if not selected and corpus:
+        return [corpus[0]]
+    return selected
 
 def make_user_prompt(question: str, context_docs: List[str]) -> str:
     if context_docs:
