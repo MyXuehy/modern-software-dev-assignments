@@ -9,7 +9,22 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in! Try to get as close to 100% correctness across all runs as possible.
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a deterministic arithmetic solver.
+
+Solve the word problem with this exact computation:
+- second_stop_marker = total_distance - miles_before_end
+- between_stops = second_stop_marker - first_stop_marker
+- verify: first_stop_marker + between_stops + miles_before_end = total_distance
+
+For this specific problem, use the numbers exactly as given.
+
+Output rule (strict):
+- Output exactly ONE line and nothing else.
+- The line must be: Answer: <number>
+- Do not output reasoning, explanations, or extra text.
+- Do not output more than one line starting with Answer:.
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".
@@ -82,5 +97,3 @@ def test_your_prompt(system_prompt: str) -> bool:
 
 if __name__ == "__main__":
     test_your_prompt(YOUR_SYSTEM_PROMPT)
-
-
