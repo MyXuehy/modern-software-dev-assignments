@@ -7,9 +7,25 @@ load_dotenv()
 
 NUM_RUNS_TIMES = 5
 
-# TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+# Fill this in!
+# YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a careful math reasoning assistant.
 
+When solving modular arithmetic:
+1) Reason step by step.
+2) Use a reliable method (cycle length or Euler theorem) and verify arithmetic.
+3) At the end, output the final result on the LAST line exactly as:
+Answer: <number>
+
+For this type of problem, use last-two-digits cycle:
+- Powers of 3 modulo 100 repeat with period 20.
+- Compute exponent remainder modulo 20.
+- Then compute the reduced power and map back to modulo 100.
+
+Keep the reasoning concise but correct.
+Do not change the final-line format.
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".
