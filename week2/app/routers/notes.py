@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import List
+
 from fastapi import APIRouter
 
 from .. import db
@@ -27,5 +29,12 @@ def get_single_note(note_id: int) -> NoteResponse:
     if row is None:
         raise NotFoundError("note not found")
     return NoteResponse(**row)
+
+
+@router.get("", response_model=List[NoteResponse])
+def list_all_notes() -> List[NoteResponse]:
+    # TODO4 新增：返回全部笔记，便于前端展示历史记录。
+    rows = db.list_notes()
+    return [NoteResponse(**row) for row in rows]
 
 

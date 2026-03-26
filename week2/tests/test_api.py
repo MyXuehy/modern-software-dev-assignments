@@ -33,7 +33,7 @@ def test_get_missing_note_returns_404(tmp_path, monkeypatch):
     assert response.json() == {"detail": "note not found"}
 
 
-def test_extract_endpoint_returns_typed_payload(tmp_path, monkeypatch):
+def test_extract_llm_endpoint_returns_typed_payload(tmp_path, monkeypatch):
     # mock LLM，验证路由返回结构与 schema 对齐。
     def fake_chat(**kwargs):
         return SimpleNamespace(message=SimpleNamespace(content='["Set up database"]'))
@@ -41,13 +41,28 @@ def test_extract_endpoint_returns_typed_payload(tmp_path, monkeypatch):
     monkeypatch.setattr(extract_service, "chat", fake_chat)
 
     with _client_with_temp_db(tmp_path, monkeypatch) as client:
-        response = client.post("/action-items/extract", json={"text": "- [ ] Set up database"})
+        response = client.post("/action-items/extract-llm", json={"text": "- [ ] Set up database"})
 
     assert response.status_code == 200
     body = response.json()
     assert body["note_id"] is None
     assert len(body["items"]) == 1
     assert body["items"][0]["text"] == "Set up database"
+
+
+def test_list_notes_returns_saved_notes(tmp_path, monkeypatch):
+    # TODO4: 新增 /notes 列表接口，应返回已保存的笔记。
+    with _client_with_temp_db(tmp_path, monkeypatch) as client:
+        create_res = client.post("/notes", json={"content": "Sprint planning notes"})
+        assert create_res.status_code == 201
+
+        list_res = client.get("/notes")
+
+    assert list_res.status_code == 200
+    payload = list_res.json()
+    assert isinstance(payload, list)
+    assert len(payload) == 1
+    assert payload[0]["content"] == "Sprint planning notes"
 
 
 def test_mark_done_returns_404_for_missing_item(tmp_path, monkeypatch):

@@ -13,6 +13,7 @@
       .item { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
       .muted { color: #6b7280; font-size: 0.875rem; }
       .row { display: flex; gap: 0.5rem; align-items: center; }
+      .section { margin-top: 1.5rem; }
     </style>
   </head>
   <body>
@@ -24,20 +25,25 @@
     <div class="row">
       <label class="row"><input id="save_note" type="checkbox" checked /> Save as note</label>
       <button id="extract">Extract</button>
+      <button id="extract_llm">Extract LLM</button>
+      <button id="list_notes">List Notes</button>
     </div>
 
     <div class="items" id="items"></div>
+    <div class="section" id="notes"></div>
 
     <script>
       const $ = (sel) => document.querySelector(sel);
       const itemsEl = $('#items');
-      const btn = $('#extract');
-      btn.addEventListener('click', async () => {
+      const notesEl = $('#notes');
+
+      // 复用提取逻辑：根据 endpoint 切换规则版/LLM 版。
+      const runExtract = async (endpoint) => {
         const text = $('#text').value;
         const save = $('#save_note').checked;
         itemsEl.textContent = 'Extracting...';
         try {
-          const res = await fetch('/action-items/extract', {
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, save_note: save }),
@@ -64,6 +70,34 @@
         } catch (err) {
           console.error(err);
           itemsEl.textContent = 'Error extracting items';
+        }
+      };
+
+      $('#extract').addEventListener('click', async () => {
+        await runExtract('/action-items/extract');
+      });
+
+      $('#extract_llm').addEventListener('click', async () => {
+        await runExtract('/action-items/extract-llm');
+      });
+
+      $('#list_notes').addEventListener('click', async () => {
+        notesEl.textContent = 'Loading notes...';
+        try {
+          const res = await fetch('/notes');
+          if (!res.ok) throw new Error('Request failed');
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            notesEl.innerHTML = '<p class="muted">No saved notes.</p>';
+            return;
+          }
+          notesEl.innerHTML = [
+            '<h2>Saved Notes</h2>',
+            ...data.map(n => `<div class="item"><span>#${n.id} - ${n.content}</span></div>`),
+          ].join('');
+        } catch (err) {
+          console.error(err);
+          notesEl.textContent = 'Error loading notes';
         }
       });
 

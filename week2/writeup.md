@@ -106,12 +106,33 @@ week2/tests/test_api.py
 ### Exercise 4: Use Agentic Mode to Automate a Small Task
 Prompt: 
 ```
-TODO
+继续完成 TODO4。
 ``` 
 
 Generated Code Snippets:
 ```
-TODO: List all modified code files with the relevant line numbers.
+week2/app/routers/action_items.py
+- L17: 同时引入 extract_action_items 与 extract_action_items_llm
+- L23-L25: 保留 /action-items/extract（规则提取）
+- L28-L31: 新增 /action-items/extract-llm（LLM 提取）
+- L34-L45: 抽取 _extract_with(...) 复用保存 note + 入库逻辑
+
+week2/app/routers/notes.py
+- L3: 新增 List 类型导入
+- L32-L36: 新增 GET /notes，返回全部 notes
+
+week2/frontend/index.html
+- L29-L31: 新增按钮 Extract LLM / List Notes
+- L34: 新增 notes 容器用于展示历史 notes
+- L41-L77: 抽取 runExtract(endpoint)，分别调用 /extract 与 /extract-llm
+- L85-L102: 新增 List Notes 按钮逻辑，调用 GET /notes 并渲染结果
+
+week2/tests/test_api.py
+- L33-L46: 将 LLM 路由测试改为 /action-items/extract-llm
+- L49-L63: 新增 test_list_notes_returns_saved_notes 覆盖 GET /notes
+
+验证结果：
+- 运行 week2 tests 后全部通过（本地记录：10 passed）
 ```
 
 

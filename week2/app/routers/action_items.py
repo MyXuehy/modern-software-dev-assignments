@@ -14,7 +14,7 @@ from ..schemas import (
     MarkDoneRequest,
     MarkDoneResponse,
 )
-from ..services.extract import extract_action_items_llm
+from ..services.extract import extract_action_items, extract_action_items_llm
 
 
 router = APIRouter(prefix="/action-items", tags=["action-items"])
@@ -22,15 +22,24 @@ router = APIRouter(prefix="/action-items", tags=["action-items"])
 
 @router.post("/extract", response_model=ExtractResponse)
 def extract(payload: ExtractRequest) -> ExtractResponse:
-    # 原接口路径保持不变，但内部改为调用 LLM 提取函数。
-    # 这样前端无需改动即可享受新能力。
+    # 保留原有提取入口：使用规则法，便于和 LLM 结果对比。
+    return _extract_with(payload, use_llm=False)
+
+
+@router.post("/extract-llm", response_model=ExtractResponse)
+def extract_llm(payload: ExtractRequest) -> ExtractResponse:
+    # TODO4 新增入口：专门调用 LLM 提取。
+    return _extract_with(payload, use_llm=True)
+
+
+def _extract_with(payload: ExtractRequest, use_llm: bool) -> ExtractResponse:
     text = payload.text
     note_id: Optional[int] = None
     if payload.save_note:
         # 可选：先保存原始笔记，再把提取出的 action item 关联到该 note。
         note_id = db.insert_note(text)
 
-    items = extract_action_items_llm(text)
+    items = extract_action_items_llm(text) if use_llm else extract_action_items(text)
     ids = db.insert_action_items(items, note_id=note_id)
     return ExtractResponse(
         note_id=note_id,
