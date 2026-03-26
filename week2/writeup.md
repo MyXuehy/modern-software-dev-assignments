@@ -139,12 +139,20 @@ week2/tests/test_api.py
 ### Exercise 5: Generate a README from the Codebase
 Prompt: 
 ```
-TODO
+为我完成TODO5，注意题目描述。
 ``` 
 
 Generated Code Snippets:
 ```
-TODO: List all modified code files with the relevant line numbers.
+week2/README.md
+- L1-L4: 项目简介与核心功能概览
+- L6-L15: 技术栈、模块与提取方式说明
+- L17-L37: 环境准备与运行步骤（Poetry + uvicorn）
+- L39-L53: Ollama 可选配置与模型说明
+- L55-L85: API endpoints 与功能描述（Notes + Action Items）
+- L87-L95: 前端按钮行为说明
+- L97-L108: 测试运行命令
+- L110-L114: SQLite 数据持久化说明
 ```
 
 
