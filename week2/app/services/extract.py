@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import os
 import re
-from typing import List
 import json
-from typing import Any
+from typing import Any, List
+
 from ollama import chat
 from dotenv import load_dotenv
 
@@ -15,6 +15,13 @@ KEYWORD_PREFIXES = (
     "todo:",
     "action:",
     "next:",
+)
+
+DEFAULT_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+LLM_SYSTEM_PROMPT = (
+    "You extract actionable tasks from meeting notes. "
+    "Return only a JSON array of strings. "
+    "Do not include explanations, markdown, or extra keys."
 )
 
 
@@ -54,16 +61,34 @@ def extract_action_items(text: str) -> List[str]:
                 continue
             if _looks_imperative(s):
                 extracted.append(s)
-    # Deduplicate while preserving order
-    seen: set[str] = set()
-    unique: List[str] = []
-    for item in extracted:
-        lowered = item.lower()
-        if lowered in seen:
-            continue
-        seen.add(lowered)
-        unique.append(item)
-    return unique
+    return _dedupe_items(extracted)
+
+
+def extract_action_items_llm(text: str) -> List[str]:
+    if not text or not text.strip():
+        return []
+
+    model = os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
+    schema: dict[str, Any] = {"type": "array", "items": {"type": "string"}}
+
+    try:
+        response = chat(
+            model=model,
+            messages=[
+                {"role": "system", "content": LLM_SYSTEM_PROMPT},
+                {"role": "user", "content": text},
+            ],
+            format=schema,
+            options={"temperature": 0},
+        )
+        content = response.message.content if getattr(response, "message", None) else ""
+        parsed = _parse_llm_items(content)
+        if parsed:
+            return _dedupe_items(parsed)
+        return []
+    except Exception:
+        # Keep behavior resilient when Ollama is unavailable or returns invalid output.
+        return extract_action_items(text)
 
 
 def _looks_imperative(sentence: str) -> bool:
@@ -87,3 +112,31 @@ def _looks_imperative(sentence: str) -> bool:
         "investigate",
     }
     return first.lower() in imperative_starters
+
+
+def _parse_llm_items(raw: str) -> List[str]:
+    if not raw:
+        return []
+    data = json.loads(raw)
+    if isinstance(data, list):
+        return [item.strip() for item in data if isinstance(item, str) and item.strip()]
+    if isinstance(data, dict):
+        for key in ("action_items", "items"):
+            candidate = data.get(key)
+            if isinstance(candidate, list):
+                return [item.strip() for item in candidate if isinstance(item, str) and item.strip()]
+    return []
+
+
+def _dedupe_items(items: List[str]) -> List[str]:
+    # Deduplicate while preserving order.
+    seen: set[str] = set()
+    unique: List[str] = []
+    for item in items:
+        lowered = item.lower()
+        if lowered in seen:
+            continue
+        seen.add(lowered)
+        unique.append(item)
+    return unique
+
