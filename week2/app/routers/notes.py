@@ -12,6 +12,7 @@ router = APIRouter(prefix="/notes", tags=["notes"])
 
 @router.post("", response_model=NoteResponse, status_code=201)
 def create_note(payload: NoteCreateRequest) -> NoteResponse:
+    # 1) 写入数据库 2) 回查完整记录（含 created_at）3) 返回统一 schema
     note_id = db.insert_note(payload.content)
     note = db.get_note(note_id)
     if note is None:
@@ -21,6 +22,7 @@ def create_note(payload: NoteCreateRequest) -> NoteResponse:
 
 @router.get("/{note_id}", response_model=NoteResponse)
 def get_single_note(note_id: int) -> NoteResponse:
+    # 根据路径参数读取单条 note；不存在时返回 404。
     row = db.get_note(note_id)
     if row is None:
         raise NotFoundError("note not found")

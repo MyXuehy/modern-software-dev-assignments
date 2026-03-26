@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# 识别无序列表/有序列表前缀（例如 "- xxx"、"* xxx"、"1. xxx"）
 BULLET_PREFIX_PATTERN = re.compile(r"^\s*([-*•]|\d+\.)\s+")
 KEYWORD_PREFIXES = (
     "todo:",
@@ -17,7 +18,9 @@ KEYWORD_PREFIXES = (
     "next:",
 )
 
+# 默认模型可通过环境变量 OLLAMA_MODEL 覆盖，便于不同机器按性能调整。
 DEFAULT_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+# System Prompt 强约束输出格式：只返回 JSON 字符串数组。
 LLM_SYSTEM_PROMPT = (
     "You extract actionable tasks from meeting notes. "
     "Return only a JSON array of strings. "
@@ -26,6 +29,10 @@ LLM_SYSTEM_PROMPT = (
 
 
 def _is_action_line(line: str) -> bool:
+    # 基于规则判断当前行是否“像任务”：
+    # - 列表项
+    # - 关键字前缀（TODO/ACTION/NEXT）
+    # - 包含待办标记 [ ] / [todo]
     stripped = line.strip().lower()
     if not stripped:
         return False
@@ -39,6 +46,7 @@ def _is_action_line(line: str) -> bool:
 
 
 def extract_action_items(text: str) -> List[str]:
+    # 规则版提取器：速度快、可解释性强，但泛化能力有限。
     lines = text.splitlines()
     extracted: List[str] = []
     for raw_line in lines:
@@ -65,13 +73,16 @@ def extract_action_items(text: str) -> List[str]:
 
 
 def extract_action_items_llm(text: str) -> List[str]:
+    # LLM 版提取器：对复杂自然语言更鲁棒。
     if not text or not text.strip():
+        # 空输入直接返回空列表，避免无意义模型调用。
         return []
 
     model = os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
     schema: dict[str, Any] = {"type": "array", "items": {"type": "string"}}
 
     try:
+        # 使用 Ollama chat，并通过 format schema 要求结构化输出。
         response = chat(
             model=model,
             messages=[
@@ -84,14 +95,17 @@ def extract_action_items_llm(text: str) -> List[str]:
         content = response.message.content if getattr(response, "message", None) else ""
         parsed = _parse_llm_items(content)
         if parsed:
+            # 统一去重，保证输出稳定。
             return _dedupe_items(parsed)
         return []
     except Exception:
         # Keep behavior resilient when Ollama is unavailable or returns invalid output.
+        # 如果本地模型未启动/超时/格式异常，回退到规则版，保证接口可用。
         return extract_action_items(text)
 
 
 def _looks_imperative(sentence: str) -> bool:
+    # 简单判断句子是否像“祈使句任务”（例如 "Write tests"）。
     words = re.findall(r"[A-Za-z']+", sentence)
     if not words:
         return False
@@ -115,12 +129,14 @@ def _looks_imperative(sentence: str) -> bool:
 
 
 def _parse_llm_items(raw: str) -> List[str]:
+    # 将模型文本解析成 Python 列表，并做类型/空值清洗。
     if not raw:
         return []
     data = json.loads(raw)
     if isinstance(data, list):
         return [item.strip() for item in data if isinstance(item, str) and item.strip()]
     if isinstance(data, dict):
+        # 兼容模型偶尔返回对象包裹的情况。
         for key in ("action_items", "items"):
             candidate = data.get(key)
             if isinstance(candidate, list):
@@ -130,6 +146,7 @@ def _parse_llm_items(raw: str) -> List[str]:
 
 def _dedupe_items(items: List[str]) -> List[str]:
     # Deduplicate while preserving order.
+    # 使用小写键去重，避免同一任务因大小写不同重复出现。
     seen: set[str] = set()
     unique: List[str] = []
     for item in items:
