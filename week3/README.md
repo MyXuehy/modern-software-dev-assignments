@@ -86,6 +86,54 @@ flowchart LR
     F --> H2[STDOUT 返回 JSON 成功]
 ```
 
-## 7. Claude Desktop/Cursor 集成说明（待补充）
-当前先保证本地脚手架可运行；真实 MCP SDK 接入与客户端配置将在下一阶段补齐。
+## 7. Codex / GitHub Copilot 客户端配置（本地 STDIO）
+
+> 兼容性说明：不同版本客户端的配置字段可能有差异（如 `mcpServers` vs `mcp_servers`）。
+> 以下示例提供最小语义映射：`command + args + env`，请以你当前客户端官方 schema 为准。
+
+### 7.1 GitHub Copilot（JSON 风格模板）
+可放在工作区级 MCP 配置文件中（路径以你的 IDE 版本为准）：
+
+```json
+{
+  "mcpServers": {
+    "week3-weather": {
+      "command": "python",
+      "args": ["-m", "week3.server.main"],
+      "env": {
+        "USE_MOCK_API": "false",
+        "REQUEST_TIMEOUT_SECONDS": "8",
+        "MAX_RETRIES": "2",
+        "RETRY_BACKOFF_SECONDS": "0.4"
+      }
+    }
+  }
+}
+```
+
+### 7.2 Codex（TOML 风格模板）
+可放在 Codex 客户端配置中（文件路径以本机安装版本为准）：
+
+```toml
+[mcp_servers.week3_weather]
+command = "python"
+args = ["-m", "week3.server.main"]
+cwd = "D:\\code\\Python\\CS146S"
+env = { USE_MOCK_API = "false", REQUEST_TIMEOUT_SECONDS = "8", MAX_RETRIES = "2", RETRY_BACKOFF_SECONDS = "0.4" }
+```
+
+### 7.3 联通验证清单
+1. 客户端能成功拉起 `week3-weather` 进程（无崩溃）。
+2. 工具列表能看到 `get_current_weather`、`get_forecast`。
+3. 触发一次工具调用并返回结构化 JSON。
+
+示例输入：
+
+```json
+{"tool":"get_current_weather","arguments":{"city":"Shanghai"}}
+```
+
+### 7.4 当前限制
+- `week3/server/main.py` 当前是课程作业的简化 STDIO 调用协议（逐行 JSON 请求/响应）。
+- 若你的客户端要求完整 MCP 握手（initialize/resources/prompts 等），下一步需新增标准 MCP SDK 入口文件。
 
