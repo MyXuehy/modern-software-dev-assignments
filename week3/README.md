@@ -66,6 +66,12 @@ $env:USE_MOCK_API="false"
 python -m week3.server.main
 ```
 
+面向 Codex/Copilot 的 MCP 客户端，建议使用 MCP 入口：
+
+```powershell
+python -m week3.server.mcp_stdio
+```
+
 ## 5. 快速测试
 在仓库根目录执行：
 
@@ -91,6 +97,8 @@ flowchart LR
 > 兼容性说明：不同版本客户端的配置字段可能有差异（如 `mcpServers` vs `mcp_servers`）。
 > 以下示例提供最小语义映射：`command + args + env`，请以你当前客户端官方 schema 为准。
 
+审阅版完整文档：`week3/docs/MCP_CLIENT_CONFIG_REVIEW.md`
+
 ### 7.1 GitHub Copilot（JSON 风格模板）
 可放在工作区级 MCP 配置文件中（路径以你的 IDE 版本为准）：
 
@@ -99,7 +107,7 @@ flowchart LR
   "mcpServers": {
     "week3-weather": {
       "command": "python",
-      "args": ["-m", "week3.server.main"],
+      "args": ["-m", "week3.server.mcp_stdio"],
       "env": {
         "USE_MOCK_API": "false",
         "REQUEST_TIMEOUT_SECONDS": "8",
@@ -117,7 +125,7 @@ flowchart LR
 ```toml
 [mcp_servers.week3_weather]
 command = "python"
-args = ["-m", "week3.server.main"]
+args = ["-m", "week3.server.mcp_stdio"]
 cwd = "D:\\code\\Python\\CS146S"
 env = { USE_MOCK_API = "false", REQUEST_TIMEOUT_SECONDS = "8", MAX_RETRIES = "2", RETRY_BACKOFF_SECONDS = "0.4" }
 ```
@@ -134,6 +142,6 @@ env = { USE_MOCK_API = "false", REQUEST_TIMEOUT_SECONDS = "8", MAX_RETRIES = "2"
 ```
 
 ### 7.4 当前限制
-- `week3/server/main.py` 当前是课程作业的简化 STDIO 调用协议（逐行 JSON 请求/响应）。
-- 若你的客户端要求完整 MCP 握手（initialize/resources/prompts 等），下一步需新增标准 MCP SDK 入口文件。
+- `week3/server/main.py` 是课程作业调试入口（逐行 JSON 请求/响应）。
+- `week3/server/mcp_stdio.py` 提供最小 MCP JSON-RPC 流程（initialize/tools/list/tools/call/ping）。
 
