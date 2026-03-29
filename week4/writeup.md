@@ -95,6 +95,12 @@ d. Before vs. after (i.e. manual workflow vs. automated workflow)
 e. How you used the automation to enhance the starter application
 > 我用它验证了 P3 完成流在数据库中的持久化状态，并把查询与结果写入文档，减少主观描述。
 
+> 目标2补充（A2：Notes CRUD enhancements，单提交）：
+> - 后端新增 `PUT /notes/{id}` 与 `DELETE /notes/{id}`，并补齐 `404` 分支（`Note not found`）。
+> - 前端在 notes 列表增加 `Edit` / `Delete` 按钮，编辑后刷新列表，删除后处理 `204 No Content`。
+> - 测试新增更新/删除成功与 not found 场景，确保接口语义与数据状态一致。
+> - 本地验证结果：`make test` 通过（10 passed），`make lint` 通过（All checks passed）。
+
 
 ### *(Optional) Automation #3*
 *If you choose to build additional automations, feel free to detail them here!*

@@ -1,6 +1,9 @@
 async function fetchJSON(url, options) {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(await res.text());
+  if (res.status === 204) return null;
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) return null;
   return res.json();
 }
 
@@ -10,7 +13,35 @@ async function loadNotes() {
   const notes = await fetchJSON('/notes/');
   for (const n of notes) {
     const li = document.createElement('li');
-    li.textContent = `${n.title}: ${n.content}`;
+
+    const text = document.createElement('span');
+    text.textContent = `${n.title}: ${n.content}`;
+    li.appendChild(text);
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = async () => {
+      const title = window.prompt('Edit title', n.title);
+      if (title === null) return;
+      const content = window.prompt('Edit content', n.content);
+      if (content === null) return;
+      await fetchJSON(`/notes/${n.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+      });
+      loadNotes();
+    };
+    li.appendChild(editBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.onclick = async () => {
+      await fetchJSON(`/notes/${n.id}`, { method: 'DELETE' });
+      loadNotes();
+    };
+    li.appendChild(deleteBtn);
+
     list.appendChild(li);
   }
 }
