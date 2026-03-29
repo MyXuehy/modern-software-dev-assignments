@@ -50,6 +50,21 @@ d. Before vs. after (i.e. manual workflow vs. automated workflow)
 e. How you used the automation to enhance the starter application
 > 我用该自动化补齐了 P3 的边界测试：`404 not found`、重复 complete 幂等、列表状态反映完成态，确保 `PUT /action-items/{id}/complete` 的行为可验证且稳定。
 
+> 目标1补充（`p3-trio` 协作演练）：
+> - `task_id`: `week4-p3-trio-001`
+> - `scope`: `backend`
+> - `max_rounds`: `2`
+> - 交接包示例：
+>   - `TestAgent -> CodeAgent`: `goal=补齐404+幂等测试`，`failed_assertions=not_found,idempotent`
+>   - `CodeAgent -> ReviewAgent`: `changed_files=[backend/tests/test_action_items.py, backend/tests/conftest.py]`
+> - Gates 结果：
+>   - `Gate-Input`: pass（参数与路径合法）
+>   - `Gate-Test`: pass（`pytest -q backend/tests` 全绿）
+>   - `Gate-Idempotency`: pass（重复 complete 结果稳定）
+>   - `Gate-Safety`: pass（无破坏性命令）
+>   - `Gate-Output`: pass（输出包含 status/summary/artifacts/risks/next_actions）
+> - 最终判定：`status=passed`，本轮无需进入第二轮。
+
 
 ### Automation #2
 a. Design inspiration (e.g. cite the best-practices and/or sub-agents docs)
