@@ -101,6 +101,18 @@ e. How you used the automation to enhance the starter application
 > - 测试新增更新/删除成功与 not found 场景，确保接口语义与数据状态一致。
 > - 本地验证结果：`make test` 通过（10 passed），`make lint` 通过（All checks passed）。
 
+> 目标B补充（Request validation and error handling）：
+> - 在 `schemas.py` 为 `title/content/description` 增加去空白 + 最小长度校验。
+> - 在 `main.py` 增加请求校验异常处理，将默认 `422` 统一映射为信息更可读的 `400`。
+> - 在 `notes/search` 增加空白查询 `400`（`Search query cannot be empty`），并补齐校验失败测试。
+> - 本地验证结果：`make test` 通过（14 passed），`make lint` 通过（All checks passed）。
+
+> 剩余任务收敛补充（按顺序完成 #2/#4/#7）：
+> - `#2` Search endpoint 完整闭环：后端搜索改为大小写不敏感；前端新增搜索输入、Search/Clear 按钮并联动 `/notes/search/`。
+> - `#4` Improve extraction logic：`extract_action_items` 新增 `include_tags=True` 模式，可同时返回 `items` 与解析出的 `#tag` 列表，并新增对应测试。
+> - `#7` Docs drift check：新增 `week4/API.md`，并按实际 OpenAPI 路由逐项核对文档一致性。
+> - 最终验证：`make test`（16 passed）、`make lint`（All checks passed）、`pre-commit --all-files --config week4/pre-commit-config.yaml` 全通过。
+
 
 ### *(Optional) Automation #3*
 *If you choose to build additional automations, feel free to detail them here!*
