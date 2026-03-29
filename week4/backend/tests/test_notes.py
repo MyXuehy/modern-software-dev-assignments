@@ -58,3 +58,25 @@ def test_delete_note_not_found(client):
     r = client.delete("/notes/999999")
     assert r.status_code == 404
     assert r.json()["detail"] == "Note not found"
+
+
+def test_create_note_validation_failure_returns_400(client):
+    r = client.post("/notes/", json={"title": "   ", "content": "Hello"})
+    assert r.status_code == 400
+    assert "title" in r.json()["detail"]
+
+
+def test_update_note_validation_failure_returns_400(client):
+    created = client.post("/notes/", json={"title": "T", "content": "C"})
+    assert created.status_code == 201, created.text
+    note_id = created.json()["id"]
+
+    r = client.put(f"/notes/{note_id}", json={"title": "Updated", "content": "   "})
+    assert r.status_code == 400
+    assert "content" in r.json()["detail"]
+
+
+def test_search_notes_empty_query_returns_400(client):
+    r = client.get("/notes/search/", params={"q": "   "})
+    assert r.status_code == 400
+    assert r.json()["detail"] == "Search query cannot be empty"

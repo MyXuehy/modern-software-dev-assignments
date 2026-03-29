@@ -45,3 +45,9 @@ def test_list_reflects_completed_state(client):
     match = next((entry for entry in items if entry["id"] == item["id"]), None)
     assert match is not None
     assert match["completed"] is True
+
+
+def test_create_action_item_validation_failure_returns_400(client):
+    r = client.post("/action-items/", json={"description": "   "})
+    assert r.status_code == 400
+    assert "description" in r.json()["detail"]

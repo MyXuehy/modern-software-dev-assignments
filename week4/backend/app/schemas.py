@@ -1,14 +1,18 @@
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, StringConstraints
+
+NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
 class NoteCreate(BaseModel):
-    title: str
-    content: str
+    title: NonEmptyText
+    content: NonEmptyText
 
 
 class NoteUpdate(BaseModel):
-    title: str
-    content: str
+    title: NonEmptyText
+    content: NonEmptyText
 
 
 class NoteRead(BaseModel):
@@ -21,7 +25,7 @@ class NoteRead(BaseModel):
 
 
 class ActionItemCreate(BaseModel):
-    description: str
+    description: NonEmptyText
 
 
 class ActionItemRead(BaseModel):

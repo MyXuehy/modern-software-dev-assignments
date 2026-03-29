@@ -28,6 +28,8 @@ def create_note(payload: NoteCreate, db: Session = Depends(get_db)) -> NoteRead:
 
 @router.get("/search/", response_model=list[NoteRead])
 def search_notes(q: Optional[str] = None, db: Session = Depends(get_db)) -> list[NoteRead]:
+    if q is not None and not q.strip():
+        raise HTTPException(status_code=400, detail="Search query cannot be empty")
     if not q:
         rows = db.execute(select(Note)).scalars().all()
     else:
