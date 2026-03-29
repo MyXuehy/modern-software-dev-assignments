@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import List
-
 from fastapi import APIRouter
 
 from .. import db
 from ..errors import NotFoundError
 from ..schemas import NoteCreateRequest, NoteResponse
-
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -31,10 +28,8 @@ def get_single_note(note_id: int) -> NoteResponse:
     return NoteResponse(**row)
 
 
-@router.get("", response_model=List[NoteResponse])
-def list_all_notes() -> List[NoteResponse]:
+@router.get("", response_model=list[NoteResponse])
+def list_all_notes() -> list[NoteResponse]:
     # TODO4 新增：返回全部笔记，便于前端展示历史记录。
     rows = db.list_notes()
     return [NoteResponse(**row) for row in rows]
-
-

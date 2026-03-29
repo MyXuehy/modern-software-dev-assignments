@@ -69,4 +69,3 @@ flowchart TD
 - [x] 真实 API 接入与增强测试
 - [x] Codex/Copilot 客户端配置模板与联通指引
 - [x] 最小 MCP JSON-RPC 入口（initialize/tools/list/tools/call/ping）
-

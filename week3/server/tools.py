@@ -37,4 +37,3 @@ class ToolRegistry:
 
         data = self._client.get_forecast(city=parsed.city, days=parsed.days)
         return {"tool": "get_forecast", "result": data}
-

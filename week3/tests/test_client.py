@@ -112,4 +112,3 @@ def test_get_current_weather_rate_limited() -> None:
         client.get_current_weather("Shanghai")
 
     assert counter["calls"] == 3
-

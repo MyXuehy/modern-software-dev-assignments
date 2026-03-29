@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
 from fastapi import APIRouter
 
 from .. import db
 from ..errors import NotFoundError
 from ..schemas import (
     ActionItemResponse,
+    ExtractedItem,
     ExtractRequest,
     ExtractResponse,
-    ExtractedItem,
     MarkDoneRequest,
     MarkDoneResponse,
 )
 from ..services.extract import extract_action_items, extract_action_items_llm
-
 
 router = APIRouter(prefix="/action-items", tags=["action-items"])
 
@@ -34,7 +31,7 @@ def extract_llm(payload: ExtractRequest) -> ExtractResponse:
 
 def _extract_with(payload: ExtractRequest, use_llm: bool) -> ExtractResponse:
     text = payload.text
-    note_id: Optional[int] = None
+    note_id: int | None = None
     if payload.save_note:
         # 可选：先保存原始笔记，再把提取出的 action item 关联到该 note。
         note_id = db.insert_note(text)
@@ -43,12 +40,14 @@ def _extract_with(payload: ExtractRequest, use_llm: bool) -> ExtractResponse:
     ids = db.insert_action_items(items, note_id=note_id)
     return ExtractResponse(
         note_id=note_id,
-        items=[ExtractedItem(id=item_id, text=text_value) for item_id, text_value in zip(ids, items)],
+        items=[
+            ExtractedItem(id=item_id, text=text_value) for item_id, text_value in zip(ids, items)
+        ],
     )
 
 
-@router.get("", response_model=List[ActionItemResponse])
-def list_all(note_id: Optional[int] = None) -> List[ActionItemResponse]:
+@router.get("", response_model=list[ActionItemResponse])
+def list_all(note_id: int | None = None) -> list[ActionItemResponse]:
     # 提供可选过滤：传 note_id 只看某条笔记对应的任务。
     rows = db.list_action_items(note_id=note_id)
     return [ActionItemResponse(**row) for row in rows]
@@ -61,5 +60,3 @@ def mark_done(action_item_id: int, payload: MarkDoneRequest) -> MarkDoneResponse
     if not updated:
         raise NotFoundError("action item not found")
     return MarkDoneResponse(id=action_item_id, done=payload.done)
-
-

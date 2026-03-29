@@ -19,9 +19,7 @@ TOOLS: list[dict[str, Any]] = [
         "description": "Get current weather for a city using Open-Meteo.",
         "inputSchema": {
             "type": "object",
-            "properties": {
-                "city": {"type": "string", "description": "City name, e.g. Shanghai"}
-            },
+            "properties": {"city": {"type": "string", "description": "City name, e.g. Shanghai"}},
             "required": ["city"],
             "additionalProperties": False,
         },
@@ -52,7 +50,9 @@ def _jsonrpc_result(request_id: Any, result: dict[str, Any]) -> dict[str, Any]:
     return {"jsonrpc": "2.0", "id": request_id, "result": result}
 
 
-def _jsonrpc_error(request_id: Any, code: int, message: str, data: dict[str, Any] | None = None) -> dict[str, Any]:
+def _jsonrpc_error(
+    request_id: Any, code: int, message: str, data: dict[str, Any] | None = None
+) -> dict[str, Any]:
     error: dict[str, Any] = {"code": code, "message": message}
     if data is not None:
         error["data"] = data
@@ -147,4 +147,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -97,4 +97,3 @@ def test_extract_action_items_llm_falls_back_on_chat_error(monkeypatch):
 
     # Fallback should use heuristic extractor and still return a task.
     assert items == ["TODO: Write docs"]
-

@@ -112,4 +112,3 @@ poetry run pytest week2/tests/test_extract.py -q
 - 数据持久化到 `week2/data/app.db`
 - 服务启动时会自动初始化表（不存在则创建）
 - 删除该文件后再次启动，数据库会重新创建
-

@@ -36,4 +36,3 @@ class ToolCallRequest(BaseModel):
 class ToolCallSuccess(BaseModel):
     ok: bool = True
     data: dict
-

@@ -6,7 +6,6 @@ import sqlite3
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,4 +38,3 @@ def register_exception_handlers(app: FastAPI) -> None:
         # 数据库异常只向客户端暴露通用信息，详细栈写入日志，减少敏感信息泄露。
         logger.exception("Database error", exc_info=exc)
         return JSONResponse(status_code=500, content={"detail": "database error"})
-

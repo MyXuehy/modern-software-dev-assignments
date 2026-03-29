@@ -25,4 +25,3 @@ def get_settings() -> Settings:
         app_title=os.getenv("APP_TITLE", "Action Item Extractor"),
         frontend_dir=frontend_dir,
     )
-

@@ -1,6 +1,6 @@
-import os
 import re
 from typing import Callable, List, Tuple
+
 from dotenv import load_dotenv
 from ollama import chat
 
@@ -42,10 +42,10 @@ Output constraints:
 # Ground-truth test suite used to evaluate generated code
 SPECIALS = set("!@#$%^&*()-_")
 TEST_CASES: List[Tuple[str, bool]] = [
-    ("Password1!", True),       # valid
-    ("password1!", False),      # missing uppercase
-    ("Password!", False),       # missing digit
-    ("Password1", False),       # missing special
+    ("Password1!", True),  # valid
+    ("password1!", False),  # missing uppercase
+    ("Password!", False),  # missing digit
+    ("Password1", False),  # missing special
 ]
 
 
@@ -113,11 +113,13 @@ def generate_initial_function(system_prompt: str) -> str:
 
 
 def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
-    """ Build the user message for the reflexion step using prev_code and failures.
+    """Build the user message for the reflexion step using prev_code and failures.
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
-    failure_block = "\n".join(f"- {f}" for f in failures) if failures else "- (no failures provided)"
+    failure_block = (
+        "\n".join(f"- {f}" for f in failures) if failures else "- (no failures provided)"
+    )
     return f"""
 Previous implementation:
 ```python

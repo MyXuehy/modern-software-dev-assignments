@@ -39,4 +39,3 @@ def build_error_response(exc: Exception) -> ErrorResponse:
     if isinstance(exc, AppError):
         return ErrorResponse(ok=False, error={"code": exc.code, "message": str(exc)})
     return ErrorResponse(ok=False, error={"code": "internal_error", "message": "Unexpected error"})
-

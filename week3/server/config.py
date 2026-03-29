@@ -14,9 +14,8 @@ class Settings:
     retry_backoff_seconds: float
     use_mock_api: bool
 
-
     @staticmethod
-    def from_env() -> "Settings":
+    def from_env() -> Settings:
         timeout_raw = os.getenv("REQUEST_TIMEOUT_SECONDS", "8")
         max_retries_raw = os.getenv("MAX_RETRIES", "2")
         retry_backoff_raw = os.getenv("RETRY_BACKOFF_SECONDS", "0.4")
@@ -55,4 +54,3 @@ class Settings:
             retry_backoff_seconds=retry_backoff,
             use_mock_api=os.getenv("USE_MOCK_API", "true").lower() == "true",
         )
-

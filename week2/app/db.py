@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
-from typing import Any, Optional
-
+from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
@@ -93,7 +92,7 @@ def list_notes() -> list[dict[str, Any]]:
         return [_to_note(row) for row in cursor.fetchall()]
 
 
-def get_note(note_id: int) -> Optional[dict[str, Any]]:
+def get_note(note_id: int) -> dict[str, Any] | None:
     # 读取单条笔记；未找到时返回 None。
     with get_connection() as connection:
         cursor = connection.cursor()
@@ -105,7 +104,7 @@ def get_note(note_id: int) -> Optional[dict[str, Any]]:
         return _to_note(row) if row is not None else None
 
 
-def insert_action_items(items: list[str], note_id: Optional[int] = None) -> list[int]:
+def insert_action_items(items: list[str], note_id: int | None = None) -> list[int]:
     # 批量插入 action items，返回每条记录的数据库 id。
     with get_connection() as connection:
         cursor = connection.cursor()
@@ -124,7 +123,7 @@ def insert_action_items(items: list[str], note_id: Optional[int] = None) -> list
         return ids
 
 
-def list_action_items(note_id: Optional[int] = None) -> list[dict[str, Any]]:
+def list_action_items(note_id: int | None = None) -> list[dict[str, Any]]:
     # 支持按 note_id 过滤；不传 note_id 则返回全部任务。
     with get_connection() as connection:
         cursor = connection.cursor()
@@ -150,5 +149,3 @@ def mark_action_item_done(action_item_id: int, done: bool) -> bool:
         )
         connection.commit()
         return cursor.rowcount > 0
-
-

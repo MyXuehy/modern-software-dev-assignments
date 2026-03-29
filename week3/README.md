@@ -144,4 +144,3 @@ env = { USE_MOCK_API = "false", REQUEST_TIMEOUT_SECONDS = "8", MAX_RETRIES = "2"
 ### 7.4 当前限制
 - `week3/server/main.py` 是课程作业调试入口（逐行 JSON 请求/响应）。
 - `week3/server/mcp_stdio.py` 提供最小 MCP JSON-RPC 流程（initialize/tools/list/tools/call/ping）。
-

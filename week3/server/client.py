@@ -191,18 +191,14 @@ class WeatherApiClient:
                 raise last_error
 
             if response.status_code >= 500:
-                last_error = ExternalApiError(
-                    f"Weather API server error ({response.status_code})"
-                )
+                last_error = ExternalApiError(f"Weather API server error ({response.status_code})")
                 if attempt < self._settings.max_retries:
                     self._backoff(attempt)
                     continue
                 raise last_error
 
             if response.status_code >= 400:
-                raise ExternalApiError(
-                    f"Weather API request failed ({response.status_code})"
-                )
+                raise ExternalApiError(f"Weather API request failed ({response.status_code})")
 
             try:
                 payload = response.json()
@@ -236,4 +232,3 @@ class WeatherApiClient:
         except (TypeError, ValueError):
             return "Unknown"
         return WEATHER_CODE_TO_TEXT.get(normalized_code, "Unknown")
-

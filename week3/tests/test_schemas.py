@@ -12,4 +12,3 @@ def test_current_weather_args_city_trimmed() -> None:
 def test_forecast_days_range() -> None:
     with pytest.raises(ValidationError):
         ForecastArgs.model_validate({"city": "Shanghai", "days": 8})
-

@@ -37,5 +37,3 @@ def test_tool_registry_forecast_mock() -> None:
 
     assert result["tool"] == "get_forecast"
     assert len(result["result"]["forecast"]) == 2
-
-

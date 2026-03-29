@@ -63,4 +63,3 @@ def test_tools_call_validation_error() -> None:
 
     assert response is not None
     assert response["error"]["code"] == -32602
-

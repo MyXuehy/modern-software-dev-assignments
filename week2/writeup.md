@@ -13,19 +13,19 @@ Name: **TODO** \
 SUNet ID: **TODO** \
 Citations: **TODO**
 
-This assignment took me about **TODO** hours to do. 
+This assignment took me about **TODO** hours to do.
 
 
 ## YOUR RESPONSES
 For each exercise, please include what prompts you used to generate the answer, in addition to the location of the generated response. Make sure to clearly add comments in your code documenting which parts are generated.
 
 ### Exercise 1: Scaffold a New Feature
-Prompt: 
+Prompt:
 ```
 1) 阅读 assignment，为 TODO1 列一个详细的修改计划。
 2) 你可以借用这个文件中的调用，完成 TODO1 的功能。
 3) 修改接口，使得原来的接口能够调用到新的函数。
-``` 
+```
 
 Generated Code Snippets:
 ```
@@ -41,10 +41,10 @@ week2/app/routers/action_items.py
 ```
 
 ### Exercise 2: Add Unit Tests
-Prompt: 
+Prompt:
 ```
 继续完成第二个 TODO，为它编写单元测试。
-``` 
+```
 
 Generated Code Snippets:
 ```
@@ -59,10 +59,10 @@ week2/tests/test_extract.py
 ```
 
 ### Exercise 3: Refactor Existing Code for Clarity
-Prompt: 
+Prompt:
 ```
 继续实现 TODO3，注意里面的 focusing 的内容。
-``` 
+```
 
 Generated/Modified Code Snippets:
 ```
@@ -104,10 +104,10 @@ week2/tests/test_api.py
 
 
 ### Exercise 4: Use Agentic Mode to Automate a Small Task
-Prompt: 
+Prompt:
 ```
 继续完成 TODO4。
-``` 
+```
 
 Generated Code Snippets:
 ```
@@ -137,10 +137,10 @@ week2/tests/test_api.py
 
 
 ### Exercise 5: Generate a README from the Codebase
-Prompt: 
+Prompt:
 ```
 为我完成TODO5，注意题目描述。
-``` 
+```
 
 Generated Code Snippets:
 ```
@@ -157,6 +157,6 @@ week2/README.md
 
 
 ## SUBMISSION INSTRUCTIONS
-1. Hit a `Command (⌘) + F` (or `Ctrl + F`) to find any remaining `TODO`s in this file. If no results are found, congratulations – you've completed all required fields. 
+1. Hit a `Command (⌘) + F` (or `Ctrl + F`) to find any remaining `TODO`s in this file. If no results are found, congratulations – you've completed all required fields.
 2. Make sure you have all changes pushed to your remote repository for grading.
-3. Submit via Gradescope. 
+3. Submit via Gradescope.

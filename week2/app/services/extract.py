@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import json
 import os
 import re
-import json
-from typing import Any, List
+from typing import Any
 
-from ollama import chat
 from dotenv import load_dotenv
+from ollama import chat
 
 load_dotenv()
 
@@ -45,10 +45,10 @@ def _is_action_line(line: str) -> bool:
     return False
 
 
-def extract_action_items(text: str) -> List[str]:
+def extract_action_items(text: str) -> list[str]:
     # 规则版提取器：速度快、可解释性强，但泛化能力有限。
     lines = text.splitlines()
-    extracted: List[str] = []
+    extracted: list[str] = []
     for raw_line in lines:
         line = raw_line.strip()
         if not line:
@@ -72,7 +72,7 @@ def extract_action_items(text: str) -> List[str]:
     return _dedupe_items(extracted)
 
 
-def extract_action_items_llm(text: str) -> List[str]:
+def extract_action_items_llm(text: str) -> list[str]:
     # LLM 版提取器：对复杂自然语言更鲁棒。
     if not text or not text.strip():
         # 空输入直接返回空列表，避免无意义模型调用。
@@ -128,7 +128,7 @@ def _looks_imperative(sentence: str) -> bool:
     return first.lower() in imperative_starters
 
 
-def _parse_llm_items(raw: str) -> List[str]:
+def _parse_llm_items(raw: str) -> list[str]:
     # 将模型文本解析成 Python 列表，并做类型/空值清洗。
     if not raw:
         return []
@@ -140,15 +140,17 @@ def _parse_llm_items(raw: str) -> List[str]:
         for key in ("action_items", "items"):
             candidate = data.get(key)
             if isinstance(candidate, list):
-                return [item.strip() for item in candidate if isinstance(item, str) and item.strip()]
+                return [
+                    item.strip() for item in candidate if isinstance(item, str) and item.strip()
+                ]
     return []
 
 
-def _dedupe_items(items: List[str]) -> List[str]:
+def _dedupe_items(items: list[str]) -> list[str]:
     # Deduplicate while preserving order.
     # 使用小写键去重，避免同一任务因大小写不同重复出现。
     seen: set[str] = set()
-    unique: List[str] = []
+    unique: list[str] = []
     for item in items:
         lowered = item.lower()
         if lowered in seen:
@@ -156,4 +158,3 @@ def _dedupe_items(items: List[str]) -> List[str]:
         seen.add(lowered)
         unique.append(item)
     return unique
-
