@@ -80,3 +80,20 @@ def test_search_notes_empty_query_returns_400(client):
     r = client.get("/notes/search/", params={"q": "   "})
     assert r.status_code == 400
     assert r.json()["detail"] == "Search query cannot be empty"
+
+
+def test_search_notes_case_insensitive(client):
+    created = client.post(
+        "/notes/",
+        json={"title": "Deploy Plan", "content": "Review Release Checklist"},
+    )
+    assert created.status_code == 201, created.text
+    note_id = created.json()["id"]
+
+    r = client.get("/notes/search/", params={"q": "deploy"})
+    assert r.status_code == 200, r.text
+    assert any(note["id"] == note_id for note in r.json())
+
+    r = client.get("/notes/search/", params={"q": "RELEASE"})
+    assert r.status_code == 200, r.text
+    assert any(note["id"] == note_id for note in r.json())
