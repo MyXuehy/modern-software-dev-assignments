@@ -36,4 +36,7 @@ def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as c:
         yield c
 
+    # Dispose connections before unlink to avoid Windows file lock errors.
+    app.dependency_overrides.pop(get_db, None)
+    engine.dispose()
     os.unlink(db_path)

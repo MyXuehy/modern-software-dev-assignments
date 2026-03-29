@@ -1,10 +1,20 @@
 .PHONY: run test format lint seed
 
+HOST ?= 127.0.0.1
+PORT ?= 8000
+PYTHONPATH_DIR ?= .
+
+ifeq ($(OS),Windows_NT)
+PY_ENV_PREFIX = set "PYTHONPATH=$(PYTHONPATH_DIR)" &&
+else
+PY_ENV_PREFIX = PYTHONPATH=$(PYTHONPATH_DIR)
+endif
+
 run:
-	PYTHONPATH=. uvicorn backend.app.main:app --reload --host $${HOST:-127.0.0.1} --port $${PORT:-8000}
+	$(PY_ENV_PREFIX) uvicorn backend.app.main:app --reload --host $(HOST) --port $(PORT)
 
 test:
-	PYTHONPATH=. pytest -q backend/tests
+	$(PY_ENV_PREFIX) pytest -q backend/tests
 
 format:
 	black .
@@ -14,4 +24,4 @@ lint:
 	ruff check .
 
 seed:
-	PYTHONPATH=. python -c "from backend.app.db import apply_seed_if_needed; apply_seed_if_needed()"
+	$(PY_ENV_PREFIX) python -c "from backend.app.db import apply_seed_if_needed; apply_seed_if_needed()"

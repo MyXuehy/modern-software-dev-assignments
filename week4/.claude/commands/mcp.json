@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "week4/data/app.db"
+      ],
+      "env": {}
+    }
+  }
+}
